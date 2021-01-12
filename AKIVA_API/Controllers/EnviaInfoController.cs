@@ -9,6 +9,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Security.Cryptography;
+using System.Configuration;
 
 namespace AKIVA_API.Controllers
 {
@@ -62,7 +63,7 @@ namespace AKIVA_API.Controllers
             crypt.EncodingMode = "HEX";
 
             //string keyHex = "4D43454E56444556";
-            string keyHex = "34443433343534453536343434353536";
+            string keyHex = ConfigurationManager.AppSettings.Get("KeyDecrypt").ToString();
             crypt.SetEncodedKey(keyHex, "hex");
 
             string decStr = crypt.DecryptStringENC(Code);
