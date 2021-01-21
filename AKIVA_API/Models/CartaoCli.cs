@@ -7,7 +7,7 @@ namespace AKIVA_API.Models
 {
     public class CartaoCli
     {
-        #region
+        #region Informação da classe
         /* 
      *      Autor: Guilherme Henrique - 08-01-2021
      *      Obs.: Essa classe representa o modelo da tabela TB_DADOS_CARTAO_COLETADO
@@ -15,8 +15,6 @@ namespace AKIVA_API.Models
      *      Os dados da tabela representam os dados do cartao do cliente
      */
         #endregion
-
-            
 
             public int Cliente_Clicodigo { get; set; }
             public string Cliente_NumCartao { get; set; }
