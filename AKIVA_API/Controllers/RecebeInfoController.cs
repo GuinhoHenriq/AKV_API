@@ -24,6 +24,8 @@ namespace AKIVA_API.Controllers
 
             int codRet = Convert.ToInt32(retorno);
 
+            dados.GravaLog(objCartao,Request.RequestUri.ToString());
+
             try
             {
                 if (codRet < 1 || codRet > 5)

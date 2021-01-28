@@ -51,8 +51,26 @@ namespace AKIVA_API.DAL
             conexao.Close();
 
             return ds;
-        }            
+        }
 
+        public void GravaLog(CartaoCli objCartao, string URL)
+        {
+            System.Data.SqlClient.SqlConnection conexao = new SqlConnection(ConfigurationManager.AppSettings.Get("Conn17"));
+            SqlCommand comando = new SqlCommand();
+            DataSet ds = new DataSet();
+            SqlDataAdapter da;
 
+            comando.Connection = conexao;
+            comando.CommandType = CommandType.StoredProcedure;
+            comando.CommandText = "GRAVA_LOG_CARTAO_DOTZ";
+            comando.CommandTimeout = 3000;
+            comando.Parameters.Add("@CLICODIGO", SqlDbType.Int).Value = objCartao.Cliente_Clicodigo;
+            comando.Parameters.Add("@LOG", SqlDbType.VarChar).Value = URL;
+            comando.Parameters.Add("@DATAHORA", SqlDbType.DateTime).Value = DateTime.Now;
+            da = new SqlDataAdapter(comando);
+            da.Fill(ds, "Dados");
+            conexao.Close();
+
+        }
     }
 }
