@@ -35,8 +35,8 @@ namespace AKIVA_API.Controllers
                 objCartao.Cliente_CVVCartao = ds.Tables[0].Rows[0]["CVV"].ToString();
                 objCartao.Num_Retorno = ds.Tables[0].Rows[0]["RETORNO"].ToString();
 
-                objCartao.Cliente_NumCartao = (Decrypt(objCartao.Cliente_NumCartao));
-                objCartao.Cliente_CVVCartao = (Decrypt(objCartao.Cliente_CVVCartao));
+                objCartao.Cliente_NumCartao = (DecryptString(objCartao.Cliente_NumCartao));
+                objCartao.Cliente_CVVCartao = (DecryptString(objCartao.Cliente_CVVCartao));
             }
             catch (Exception ex)
             {
@@ -70,8 +70,8 @@ namespace AKIVA_API.Controllers
                 objCartao.Cliente_CVVCartao = ds.Tables[0].Rows[0]["CVV"].ToString();
                 objCartao.Num_Retorno = ds.Tables[0].Rows[0]["RETORNO"].ToString();
 
-                objCartao.Cliente_NumCartao = (Decrypt(objCartao.Cliente_NumCartao));
-                objCartao.Cliente_CVVCartao = (Decrypt(objCartao.Cliente_CVVCartao));
+                objCartao.Cliente_NumCartao = (DecryptString(objCartao.Cliente_NumCartao));
+                objCartao.Cliente_CVVCartao = (DecryptString(objCartao.Cliente_CVVCartao));
 
                 JsonConvert.SerializeObject(objCartao);
 
@@ -87,23 +87,64 @@ namespace AKIVA_API.Controllers
         }
 
         #region Método que Decriptografa as informações do BD
-        static string Decrypt(string Code)
+        
+        public static string DecryptString(string code)
         {
-            Chilkat.Crypt2 crypt = new Chilkat.Crypt2();
-            crypt.CryptAlgorithm = "AES";
-            crypt.CipherMode = "ECB";
-            crypt.KeyLength = 128;
-            crypt.PaddingScheme = 0;
-            crypt.EncodingMode = "HEX";
+            byte[] text = FromHex(code);
+            byte[] key = FromHex(ConfigurationManager.AppSettings.Get("KeyDecrypt"));
+           
 
-            //string keyHex = "4D43454E56444556";
-            string keyHex = ConfigurationManager.AppSettings.Get("KeyDecrypt").ToString();
-            crypt.SetEncodedKey(keyHex, "hex");
-
-            string decStr = crypt.DecryptStringENC(Code);
-
-            return decStr;
+            //return BitConverter.ToString(Encoding.Default.GetBytes(decrypt(text, key)));
+            return decrypt(text, key);
         }
-        #endregion
+
+        public static byte[] FromHex(string hex)
+        {
+            byte[] raw = new byte[hex.Length / 2];
+            for (int i = 0; i < raw.Length; i++)
+            {
+                raw[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+            }
+            return raw;
+        }
+
+        public static byte[] FromText(string hex)
+        {
+            byte[] raw = new byte[hex.Length / 2];
+            for (int i = 0; i < raw.Length; i++)
+            {
+                raw[i] = Convert.ToByte(hex.Substring(i, 1), 16);
+            }
+            return raw;
+        }
+
+        public static String decrypt(byte[] input, byte[] key)
+        {
+            byte[] data = input;
+            String decrypted;
+
+            using (RijndaelManaged rijAlg = new RijndaelManaged())
+            {
+                rijAlg.Key = key;
+                rijAlg.Mode = CipherMode.ECB;
+                rijAlg.BlockSize = 128;
+                rijAlg.Padding = PaddingMode.PKCS7;
+
+                ICryptoTransform decryptor = rijAlg.CreateDecryptor(rijAlg.Key, null);
+                using (MemoryStream msDecrypt = new MemoryStream(data))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+                            decrypted = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+            return decrypted.ToString();
+        }
+
     }
+        #endregion
 }

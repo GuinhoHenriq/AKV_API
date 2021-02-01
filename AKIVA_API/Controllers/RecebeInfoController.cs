@@ -46,7 +46,7 @@ namespace AKIVA_API.Controllers
                             return Request.CreateResponse(HttpStatusCode.OK, "Dados do cartão coletados com Sucesso!");
                         }
                     }
-                    return Request.CreateResponse(HttpStatusCode.OK, "Retorne um Código Valido");
+                    return Request.CreateResponse(HttpStatusCode.OK, "OK");
                 }
             }
             catch (Exception ex)
